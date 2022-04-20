@@ -67,61 +67,11 @@ jobs:
           name: SavvyCAN-macOS_x64.dmg
           path: SavvyCAN.dmg
           
-  buildwindows:
-    name: Windows x64
-    runs-on: windows-2019
-
-    steps:      
-      - name: Prepare Qt Libraries
-        uses: jurplel/install-qt-action@v2
-
-      - name: Clone
-        uses: actions/checkout@v2
-      
-      - name: Compile
-        shell: cmd
-        run: | 
-          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-
-          qmake CONFIG+=release SavvyCAN.pro
-          nmake /C
-
-      - name: Package
-        run: |
-          mkdir package
-          copy "release/SavvyCAN.exe" package/
-          mkdir package/help
-          copy  help/*.md package/help/
-          mkdir package/help/images
-          copy help/images/*.* package/help/images/
-          mkdir package/examples
-          copy examples/*.* package/examples/          
-          copy "${Env:Qt5_Dir}/bin/Qt5Core.dll" package/
-          copy "${Env:Qt5_Dir}/bin/Qt5Gui.dll" package/
-          copy "${Env:Qt5_Dir}/bin/Qt5Network.dll" package/
-          copy "${Env:Qt5_Dir}/bin/Qt5PrintSupport.dll" package/
-          copy "${Env:Qt5_Dir}/bin/Qt5Qml.dll" package/
-          copy "${Env:Qt5_Dir}/bin/Qt5SerialBus.dll" package/
-          copy "${Env:Qt5_Dir}/bin/Qt5SerialPort.dll" package/
-          copy "${Env:Qt5_Dir}/bin/Qt5Widgets.dll" package/
-          mkdir package/imageformats
-          copy "${Env:Qt5_Dir}/plugins/imageformats/*.*" package/imageformats/
-          mkdir package/platforms
-          copy "${Env:Qt5_Dir}/plugins/platforms/*.*" package/platforms/
-          mkdir package/styles
-          copy "${Env:Qt5_Dir}/plugins/styles/*.*" package/styles/
-          mkdir package/canbus
-          copy "${Env:Qt5_Dir}/plugins/canbus/*.*" package/canbus/
-
-      - uses: actions/upload-artifact@v2
-        with:
-          name: SavvyCAN-Windows_x64
-          path: package
  
   pre-release:
     name: "pre-release"
     runs-on: "ubuntu-latest"
-    needs: [buildwindows, buildmacos, buildlinux]
+    needs: [buildmacos, buildlinux]
 
     steps:
       - uses: actions/checkout@v2
@@ -138,6 +88,5 @@ jobs:
           title: "Development Build"
           files: |
             SavvyCAN-Linux_x64.AppImage/SavvyCAN-x86_64.AppImage
-            SavvyCAN_CIBuild.zip
             SavvyCAN-macOS_x64.dmg/SavvyCAN.dmg
         
